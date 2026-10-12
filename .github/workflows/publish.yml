@@ -1,0 +1,54 @@
+name: Publish
+
+# Runs only when a semantic-version tag is pushed, e.g. `v0.1.0`. Never runs on ordinary pushes.
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET 8 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Verify tag matches project version
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PROJECT_VERSION="$(sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' src/FinSightIQ.BuildingBlocks/FinSightIQ.BuildingBlocks.csproj | head -n1)"
+          echo "Tag version: ${TAG_VERSION}; project version: ${PROJECT_VERSION}"
+          if [ "${TAG_VERSION}" != "${PROJECT_VERSION}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match <Version>${PROJECT_VERSION}</Version> in the csproj."
+            exit 1
+          fi
+
+      - name: Restore
+        run: dotnet restore FinSightIQ.BuildingBlocks.sln
+
+      - name: Build
+        run: dotnet build FinSightIQ.BuildingBlocks.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test FinSightIQ.BuildingBlocks.sln --configuration Release --no-build
+
+      - name: Pack
+        run: dotnet pack src/FinSightIQ.BuildingBlocks/FinSightIQ.BuildingBlocks.csproj --configuration Release --no-build --output ./artifacts
+
+      - name: Publish to GitHub Packages
+        # --skip-duplicate makes re-running a tag safe: an existing version is never overwritten.
+        run: >
+          dotnet nuget push "./artifacts/*.nupkg"
+          --source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+          --api-key "${{ secrets.GITHUB_TOKEN }}"
+          --skip-duplicate

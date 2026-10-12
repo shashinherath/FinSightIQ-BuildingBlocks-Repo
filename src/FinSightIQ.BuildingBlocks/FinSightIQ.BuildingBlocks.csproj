@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <RootNamespace>FinSightIQ.BuildingBlocks</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- NuGet package metadata. Packages are created only by an explicit `dotnet pack`. -->
+  <PropertyGroup>
+    <PackageId>FinSightIQ.BuildingBlocks</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>FinSightIQ</Authors>
+    <Company>FinSightIQ</Company>
+    <Description>Dependency-free shared primitives for FinSightIQ .NET services: Result, PagedResult, BaseEntity, DomainException and CorrelationId.</Description>
+    <PackageTags>finsightiq;building-blocks;result;pagination</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/shashinherath/FinSightIQ-BuildingBlocks-Repo</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/shashinherath/FinSightIQ-BuildingBlocks-Repo</PackageProjectUrl>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
